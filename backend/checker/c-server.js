@@ -16,6 +16,21 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch(err => console.error("❌ MongoDB connection error:", err));
 
+
+app.post("/login", async(req, res) => {
+  try {
+    const { username, password } = req.body;
+    // Simple hardcoded check (replace with real auth in production)
+    if (username === "admin" && password === "password") {
+      res.json({ success: true, message: "Login successful" });
+    } else {
+      res.status(401).json({ success: false, message: "Invalid credentials" });
+    }
+  }
+  catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 // ✅ Route to add a new product (recipe)
 app.post("/addProduct", async (req, res) => {
   try {
