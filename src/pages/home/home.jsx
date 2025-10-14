@@ -1,12 +1,66 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import RecipeCard from "../../components/RecipeCard.jsx";
+import RecipeCardInverse from "../../components/RecipeCard2.jsx";
+
 
 // --- A simple, hardcoded list of ingredients for the search dropdown ---
 const ALL_INGREDIENTS = [
-  'Chicken Breast', 'Tomato', 'Garlic', 'Olive Oil', 'Onion', 'Bell Pepper',
-  'Broccoli', 'Carrot', 'Pasta', 'Rice', 'Potato', 'Cheese', 'Salt', 'Black Pepper',
-  'Basil', 'Oregano', 'Salmon', 'Lemon', 'Butter', 'Flour', 'Sugar', 'Egg',
-  'Cucumber', 'Spinach', 'Mushroom', 'Ginger', 'Soy Sauce', 'Honey'
+  // 🌾 Grains, Pulses, Dals
+  'Rice', 'Basmati Rice', 'Brown Rice', 'Wheat Flour', 'Maida', 'Semolina', 'Poha', 'Oats',
+  'Moong Dal', 'Toor Dal', 'Masoor Dal', 'Urad Dal', 'Chana Dal', 'Rajma', 'Kabuli Chana',
+  'Kala Chana', 'Lobia', 'Green Gram', 'Split Peas', 'Soya Chunks', 'Besan', 'Corn Flour',
+
+  // 🧀 Dairy & Protein
+  'Paneer', 'Cheese', 'Milk', 'Curd', 'Butter', 'Ghee', 'Cream', 'Yogurt', 'Buttermilk',
+
+  // 🧄 Vegetables
+  'Potato', 'Tomato', 'Onion', 'Garlic', 'Ginger', 'Carrot', 'Beetroot', 'Cabbage', 'Cauliflower',
+  'Broccoli', 'Spinach', 'Methi Leaves', 'Coriander Leaves', 'Mint Leaves', 'Drumstick',
+  'Bottle Gourd', 'Bitter Gourd', 'Ridge Gourd', 'Snake Gourd', 'Pumpkin', 'Ash Gourd',
+  'Brinjal', 'Lady Finger', 'Capsicum', 'Bell Pepper', 'Green Chilli', 'Red Chilli',
+  'Cucumber', 'Zucchini', 'Sweet Corn', 'Peas', 'Beans', 'French Beans', 'Cluster Beans',
+  'Spring Onion', 'Radish', 'Turnip', 'Yam', 'Tapioca', 'Colocasia', 'Raw Banana',
+  'Raw Mango', 'Coconut', 'Tender Coconut', 'Jackfruit', 'Raw Papaya',
+
+  // 🍅 Fruits used in cooking
+  'Lemon', 'Apple', 'Banana', 'Mango', 'Pineapple', 'Pomegranate', 'Orange',
+  'Grapes', 'Guava', 'Watermelon', 'Muskmelon', 'Chiku', 'Papaya', 'Dates', 'Raisin',
+
+  // 🌿 Herbs & Greens
+  'Coriander', 'Parsley', 'Basil', 'Oregano', 'Thyme', 'Rosemary', 'Sage', 'Dill Leaves',
+  'Celery', 'Fenugreek', 'Amaranth Leaves', 'Mustard Leaves',
+
+  // 🍛 Indian Masalas & Spices
+  'Turmeric Powder', 'Cumin Seeds', 'Coriander Powder', 'Cumin Powder', 'Red Chilli Powder',
+  'Kashmiri Chilli Powder', 'Garam Masala', 'Chaat Masala', 'Sambar Powder', 'Rasam Powder',
+  'Kitchen King Masala', 'Biryani Masala', 'Pav Bhaji Masala', 'Chole Masala', 'Rajma Masala',
+  'Pepper', 'Black Pepper', 'White Pepper', 'Clove', 'Cardamom', 'Cinnamon', 'Bay Leaf',
+  'Star Anise', 'Nutmeg', 'Mace', 'Mustard Seeds', 'Fennel Seeds', 'Fenugreek Seeds',
+  'Nigella Seeds', 'Carom Seeds', 'Asafoetida', 'Kasuri Methi', 'Tamarind', 'Dry Mango Powder',
+  'Rock Salt', 'Himalayan Salt', 'Sea Salt', 'Regular Salt',
+
+  // 🧂 Condiments & Sauces
+  'Vinegar', 'Soy Sauce', 'Tomato Ketchup', 'Chilli Sauce', 'Schezwan Sauce',
+  'Mustard Sauce', 'Mayonnaise', 'Green Chutney', 'Tamarind Chutney', 'Mint Chutney',
+
+  // 🍞 Miscellaneous & Baking Items
+  'Bread', 'Yeast', 'Baking Soda', 'Baking Powder', 'Sugar', 'Brown Sugar', 'Honey',
+  'Jaggery', 'Cocoa Powder', 'Vanilla Essence', 'Cornflakes', 'Rice Flour', 'Custard Powder',
+
+  // 🧈 Oils & Fats
+  'Olive Oil', 'Sunflower Oil', 'Mustard Oil', 'Groundnut Oil', 'Coconut Oil', 'Sesame Oil',
+
+  // 🍋 Dry Fruits & Nuts
+  'Almond', 'Cashew', 'Pistachio', 'Walnut', 'Peanut', 'Lotus Seeds', 'Poppy Seeds',
+
+  // 🍲 Soups, Pastas, Misc
+  'Pasta', 'Macaroni', 'Noodles', 'Vermicelli', 'Soup Mix', 'Stock Cube', 'Tofu', 'Seitan',
+
+  // 🥗 Other Indian items
+  'Sabudana', 'Sago', 'Flattened Rice', 'Idli Rava', 'Rice Flour', 'Tapioca Flour',
+  'Coconut Milk', 'Rice Bran Oil', 'Palm Sugar', 'Jowar Flour', 'Bajra Flour', 'Ragi Flour',
+  'Multigrain Flour'
 ];
 
 // --- A new component to inject our custom scrollbar styles ---
@@ -39,6 +93,7 @@ const SearchIcon = () => (
 
 function Home() {
   const [selectedIngredients, setSelectedIngredients] = useState([]);
+  const [RecommendedRecipes, setRecommendedRecipes] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [imageFile, setImageFile] = useState(null);
@@ -164,8 +219,20 @@ function Home() {
                     });
 
                     const data = await response.json();
-                    console.log(data.detected_ingredients);
 
+                    const response2 = await fetch('http://localhost:5000/recommend', {
+                      method: 'POST',
+                      headers: {
+                        "Content-Type": "application/json"
+                      },
+                      body: JSON.stringify({
+                        ingredients: data.detected_ingredients
+                      })
+                    });
+
+                    const recipes = await response2.json();
+                    setRecommendedRecipes(recipes);
+                    console.log('Recommended Recipes:', recipes);            
                     
                   } catch (error) {
                     console.error('Error:', error);
@@ -188,6 +255,22 @@ function Home() {
             />
           </div>
         </section>
+        <section className="mt-12">
+          {RecommendedRecipes.length > 0 && (
+            <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Recommended Recipes</h2>
+          )}
+
+          <div className="space-y-6">
+            {RecommendedRecipes.map((recipe, idx) => (
+              idx % 2 === 0 ? (
+                <RecipeCard key={idx} recipeData={recipe} />
+              ) : (
+                <RecipeCardInverse key={idx} recipeData={recipe} />
+              )
+            ))}
+          </div>
+        </section>
+
       </main>
     </div>
   );
