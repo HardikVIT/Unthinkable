@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 import Product from "./model/product.js"; // your model
-import { image } from "framer-motion/client";
+import Login from "./model/log.js"; // your Mongoose model
 
 dotenv.config();
 
@@ -16,21 +16,51 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch(err => console.error("❌ MongoDB connection error:", err));
 
-
-app.post("/login", async(req, res) => {
+app.post("/signup", async (req, res) => {
   try {
-    const { username, password } = req.body;
-    // Simple hardcoded check (replace with real auth in production)
-    if (username === "admin" && password === "password") {
-      res.json({ success: true, message: "Login successful" });
-    } else {
-      res.status(401).json({ success: false, message: "Invalid credentials" });
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
     }
-  }
-  catch (err) {
-    res.status(500).json({ error: err.message });
+
+    // Check if user exists
+    const existing = await Login.findOne({ email });
+    if (existing) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    const newUser = new Login({ name, email, Password: password });
+    await newUser.save();
+
+    // ✅ Return username with success
+    res.json({ name: name, success: true, message: "Signup successful" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 });
+
+
+
+app.post("/login", async (req, res) => {
+  console.log("Login request body:", req.body);
+  try {
+    const { email, password } = req.body;
+    const user = await Login.findOne({ email });
+
+    if (!user || user.Password !== password) {
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
+    }
+    console.log(user.name);
+    res.json({ name:user.name,success: true, message: "Login successful" });
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 // ✅ Route to add a new product (recipe)
 app.post("/addProduct", async (req, res) => {
   try {
