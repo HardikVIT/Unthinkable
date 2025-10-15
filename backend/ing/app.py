@@ -59,6 +59,7 @@ def get_recipes():
                 di.append(i)
         for i in ingredients:
                 di.append(i)
+        print(f"🍽️ Final detected ingredients: {di}"   )
         return jsonify({
             "detected_ingredients": di
         })
