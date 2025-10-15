@@ -141,6 +141,7 @@ function Home() {
 
       const response = await fetch('http://127.0.0.1:5000/get_recipes', { method: 'POST', body: formData });
       const data = await response.json();
+      console.log('Detected Ingredients:', data.detected_ingredients);
 
       const response2 = await fetch('http://localhost:5000/recommend', {
         method: 'POST',
